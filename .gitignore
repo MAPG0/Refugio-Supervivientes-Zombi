@@ -1,0 +1,6 @@
+# Ejecutables
+refugio
+
+# Archivos temporales
+*.o
+*.out
