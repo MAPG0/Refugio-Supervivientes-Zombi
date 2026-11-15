@@ -1,187 +1,171 @@
 #include <stdio.h>
-# include <string.h>
-#include <time.h>
-
-#define ARCH_SUP "supervivientes.txt"
-#define ARCH_REC "recursos.txt"
-#define ARCH_HIS "historial.txt"
+#include <stdlib.h>
+#include <string.h>
 
 /*
  * Proyecto: Refugio de supervivientes zombi
  * Practica 3 - Introduccion a la Ingenieria de Software
  * HU-00: Preparar entorno y tablero
+ * HU-01: Definir superviviente y refugio
+ * HU-02: Registrar supervivientes
  */
 
 typedef struct {
-    char *nombre;
+    char nombre[30];
     int edad;
-    char *habilidad;
+    char habilidad[30];
     int salud;
 } Superviviente;
 
 typedef struct {
-    int agua, comida, medicamentos, municiones;
-} Recursos;
-
-typedef struct {
-    int dia;
-    char *descripcion;
-} Evento;
-
-typedef struct {
     Superviviente *lista;
-    int n, capacidad;
-    Recursos recursos;
-    Evento *historial;
-    int nh, ch;
-    int dia;
+    int n;
+    int capacidad;
 } Refugio;
 
-
-char *leer_cadena() {
-  void inicializar_refugio(Refugio *r) {
-    r->lista = malloc(sizeof(Superviviente));
-    r->n = 0;
-    r->capacidad = 1;
-
-    r->historial = malloc(sizeof(Evento));
-    r->nh = 0;
-    r->ch = 1;
-
-    r->recursos.agua = 10;
-    r->recursos.comida = 10;
-    r->recursos.medicamentos = 5;
-    r->recursos.municiones = 10;
-  char *cadena;
-    char caracter;
-    int n;
-
-    cadena = malloc(sizeof(char));
-    n = 0;
-
-    if (cadena == NULL) {
-        printf("No hay memoria disponible.\n");
-        exit(1);
-    }
-
-    while ((caracter = getchar()) != '\n' && caracter != EOF) {
-        cadena = realloc(cadena, (n + 2) * sizeof(char));
-
-        if (cadena == NULL) {
-            printf("No hay memoria disponible.\n");
-            exit(1);
-        }
-
-        cadena[n] = caracter;
-        n++;
-    }
-
-    cadena[n] = '\0';
-    return cadena;
-}
-
-int leer_entero() {
-    int numero;
-    scanf("%d", &numero);
-    getchar();
-    return numero;
-}
-
 void inicializar_refugio(Refugio *r);
-void registrar_evento(Refugio *r, char *descripcion);
-void agregar_superviviente(Refugio *r);
-void listar_supervivientes(Refugio *r);
-void mostrar_recursos(Refugio *r);
+void leer_texto(char texto[], int tamanio);
+int leer_entero();
+int agregar_superviviente(Refugio *r);
 
-int main(void)
-{
+int main(void) {
+    Refugio refugio;
+    int opcion;
+
+    inicializar_refugio(&refugio);
+
     printf("HU-00: Preparacion del entorno\n");
     printf("Refugio de supervivientes zombi\n");
+
+    do {
+        printf("\n===== MENU DEL REFUGIO =====\n");
+        printf("1. Registrar superviviente\n");
+        printf("0. Salir\n");
+        printf("Selecciona una opcion: ");
+
+        opcion = leer_entero();
+
+        switch (opcion) {
+            case 1:
+                agregar_superviviente(&refugio);
+                break;
+
+            case 0:
+                printf("Saliendo del programa.\n");
+                break;
+
+            default:
+                printf("Opcion invalida.\n");
+        }
+
+    } while (opcion != 0);
+
+    free(refugio.lista);
+    refugio.lista = NULL;
 
     return 0;
 }
 
-
 void inicializar_refugio(Refugio *r) {
-    r->lista = malloc(sizeof(Superviviente));
+    r->lista = NULL;
     r->n = 0;
-    r->capacidad = 1;
-
-    r->historial = malloc(sizeof(Evento));
-    r->nh = 0;
-    r->ch = 1;
-
-    r->recursos.agua = 10;
-    r->recursos.comida = 10;
-    r->recursos.medicamentos = 5;
-    r->recursos.municiones = 10;
-
-    r->dia = 1;
+    r->capacidad = 0;
 }
 
-void registrar_evento(Refugio *r, char *descripcion) {
-    if (r->nh == r->ch) {
-        r->ch = r->ch * 2;
-        r->historial = realloc(r->historial, r->ch * sizeof(Evento));
+void leer_texto(char texto[], int tamanio) {
+    int c;
+
+    fgets(texto, tamanio, stdin);
+
+    if (strchr(texto, '\n') != NULL) {
+        texto[strcspn(texto, "\n")] = '\0';
+    } else {
+        while ((c = getchar()) != '\n' && c != EOF) {
+        }
+    }
+}
+
+int leer_entero() {
+    char texto[30];
+    int numero;
+
+    if (fgets(texto, 30, stdin) == NULL) {
+        return 0;
     }
 
-    r->historial[r->nh].dia = r->dia;
-    r->historial[r->nh].descripcion = malloc(strlen(descripcion) + 1);
-    strcpy(r->historial[r->nh].descripcion, descripcion);
+    while (sscanf(texto, "%d", &numero) != 1) {
+        printf("Ingresa un numero valido: ");
 
-    r->nh++;
+        if (fgets(texto, 30, stdin) == NULL) {
+            return 0;
+        }
+    }
+
+    return numero;
 }
 
-void agregar_superviviente(Refugio *r) {
-    char *nombre;
-    char *habilidad;
-    int edad;
+int agregar_superviviente(Refugio *r) {
+    Superviviente nuevo;
+    Superviviente *temporal;
+    int nueva_capacidad;
 
-    printf("Nombre: ");
-    nombre = leer_cadena();
+    printf("\nNombre: ");
+    leer_texto(nuevo.nombre, 30);
+
+    if (strlen(nuevo.nombre) == 0) {
+        printf("El nombre no puede estar vacio.\n");
+        return 0;
+    }
 
     printf("Edad: ");
-    edad = leer_entero();
+    nuevo.edad = leer_entero();
 
-    printf("Habilidad: ");
-    habilidad = leer_cadena();
+    if (nuevo.edad <= 0) {
+        printf("La edad debe ser mayor que cero.\n");
+        return 0;
+    }
+
+    printf("Habilidad especial: ");
+    leer_texto(nuevo.habilidad, 30);
+
+    printf("Salud (0 a 100): ");
+    nuevo.salud = leer_entero();
+
+    if (nuevo.salud < 0 || nuevo.salud > 100) {
+        printf("La salud debe estar entre 0 y 100.\n");
+        return 0;
+    }
 
     if (r->n == r->capacidad) {
-        r->capacidad = r->capacidad * 2;
-        r->lista = realloc(r->lista, r->capacidad * sizeof(Superviviente));
+
+        if (r->capacidad == 0) {
+            nueva_capacidad = 1;
+        } else {
+            nueva_capacidad = r->capacidad * 2;
+        }
+
+        /* Reservar memoria */
+        if (r->lista == NULL) {
+            temporal = malloc(nueva_capacidad * sizeof(Superviviente));
+        } else {
+            temporal = realloc(r->lista,
+                               nueva_capacidad * sizeof(Superviviente));
+        }
+
+        if (temporal == NULL) {
+            printf("No se pudo reservar memoria.\n");
+            return 0;
+        }
+
+        r->lista = temporal;
+        r->capacidad = nueva_capacidad;
     }
-
-    r->lista[r->n].nombre = nombre;
-    r->lista[r->n].edad = edad;
-    r->lista[r->n].habilidad = habilidad;
-    r->lista[r->n].salud = 100;
-
+    r->lista[r->n] = nuevo;
     r->n++;
 
-    registrar_evento(r, "Se agrego un superviviente.");
-    printf("Superviviente agregado.\n");
+    printf("\nSuperviviente registrado correctamente.\n");
+
+    return 1;
 }
 
-void listar_supervivientes(Refugio *r) {
-    int i;
-
-    if (r->n == 0) {
-        printf("No hay supervivientes.\n");
-        return;
-    }
-
-    for (i = 0; i < r->n; i++) {
-        printf("\nNombre: %s\n", r->lista[i].nombre);
-        printf("Edad: %d\n", r->lista[i].edad);
-        printf("Habilidad: %s\n", r->lista[i].habilidad);
-        printf("Salud: %d\n", r->lista[i].salud);
-    }
-}
-
-void mostrar_recursos(Refugio *r) {
-    printf("\nAgua: %d\n", r->recursos.agua);
-    printf("Comida: %d\n", r->recursos.comida);
-    printf("Medicamentos: %d\n", r->recursos.medicamentos);
-    printf("Municiones: %d\n", r->recursos.municiones);
-}
 
