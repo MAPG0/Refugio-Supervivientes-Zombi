@@ -7,21 +7,6 @@
 /*
  * Proyecto: Refugio de supervivientes zombi
  * Practica 3 - Introduccion a la Ingenieria de Software
- * HU-00: Preparar entorno y tablero
- * HU-01: Definir superviviente y refugio
- * HU-02: Registrar supervivientes
- * HU-03: Listar supervivientes
- * HU-04: Administrar recursos
- * HU-05: Modificar recursos
- * HU-06: Registrar y mostrar eventos
- * HU-07: Dar de baja supervivientes
- * HU-08: Realizar expediciones
- * HU-09: Perder recursos
- * HU-10: Guardar partida
- * HU-11: Cargar partida
- * HU-12: Eventos aleatorios
- * HU-13: Liberar memoria
- * HU-14: Documentar funciones
  */
 
 typedef struct {
@@ -54,7 +39,6 @@ typedef struct {
     int dia;
 } Refugio;
 
-/* Prototipos */
 void inicializar_refugio(Refugio *r);
 void inicializar_recursos(Refugio *r);
 void leer_texto(char texto[], int tamanio);
@@ -86,7 +70,7 @@ int main(void) {
     printf("Refugio de supervivientes zombi\n");
 
     do {
-        printf("\n===== MENU DEL REFUGIO =====\n");
+        printf("\n MENU DEL REFUGIO \n");
         printf("1. Registrar superviviente\n");
         printf("2. Listar supervivientes\n");
         printf("3. Mostrar recursos\n");
@@ -265,7 +249,7 @@ int agregar_superviviente(Refugio *r) {
 
 void listar_supervivientes(const Refugio *r) {
     int i;
-    printf("\n===== SUPERVIVIENTES DEL REFUGIO =====\n");
+    printf("\n SUPERVIVIENTES DEL REFUGIO \n");
     if (r->n == 0) {
         printf("No hay supervivientes registrados.\n");
         return;
@@ -282,7 +266,7 @@ void listar_supervivientes(const Refugio *r) {
 
 
 void mostrar_recursos(const Refugio *r) {
-    printf("\n===== RECURSOS DEL REFUGIO =====\n");
+    printf("\n RECURSOS DEL REFUGIO \n");
     printf("Agua: %d\n", r->recursos.agua);
     printf("Comida: %d\n", r->recursos.comida);
     printf("Medicamentos: %d\n", r->recursos.medicamentos);
@@ -292,7 +276,7 @@ void mostrar_recursos(const Refugio *r) {
 
 int seleccionar_recurso(void) {
     int tipo;
-    printf("\n===== RECURSOS =====\n");
+    printf("\n RECURSOS \n");
     printf("1. Agua\n2. Comida\n3. Medicamentos\n4. Municiones\n0. Cancelar\nSelecciona recurso: ");
     tipo = leer_entero();
     if (tipo < 0 || tipo > 4) {
@@ -360,7 +344,7 @@ int registrar_evento(Refugio *r, const char *descripcion) {
 
 void mostrar_eventos(const Refugio *r) {
     int i;
-    printf("\n===== HISTORIAL DE EVENTOS =====\n");
+    printf("\n HISTORIAL DE EVENTOS \n");
     if (r->cantidad_eventos == 0) {
         printf("No hay eventos registrados.\n");
         return;
@@ -404,7 +388,7 @@ void realizar_expedicion(Refugio *r) {
         printf("No hay supervivientes disponibles para la expedicion.\n");
         return;
     }
-    printf("\n===== SUPERVIVIENTES =====\n");
+    printf("\n SUPERVIVIENTES \n");
     for (i = 0; i < r->n; i++) {
         printf("%d. %s (salud %d)\n", i + 1, r->lista[i].nombre, r->lista[i].salud);
     }
