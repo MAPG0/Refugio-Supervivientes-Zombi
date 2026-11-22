@@ -1,3 +1,4 @@
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -8,6 +9,8 @@
  * HU-00: Preparar entorno y tablero
  * HU-01: Definir superviviente y refugio
  * HU-02: Registrar supervivientes
+ * HU-03: Listar supervivientes
+ * HU-04: Administrar recursos del refugio
  */
 
 typedef struct {
@@ -18,15 +21,26 @@ typedef struct {
 } Superviviente;
 
 typedef struct {
+    int agua;
+    int comida;
+    int medicamentos;
+    int municiones;
+} Recursos;
+
+typedef struct {
     Superviviente *lista;
     int n;
     int capacidad;
+    Recursos recursos;
 } Refugio;
 
 void inicializar_refugio(Refugio *r);
+void inicializar_recursos(Refugio *r);
 void leer_texto(char texto[], int tamanio);
-int leer_entero();
+int leer_entero(void);
 int agregar_superviviente(Refugio *r);
+void listar_supervivientes(const Refugio *r);
+void mostrar_recursos(const Refugio *r);
 
 int main(void) {
     Refugio refugio;
@@ -40,6 +54,8 @@ int main(void) {
     do {
         printf("\n===== MENU DEL REFUGIO =====\n");
         printf("1. Registrar superviviente\n");
+        printf("2. Listar supervivientes\n");
+        printf("3. Mostrar recursos\n");
         printf("0. Salir\n");
         printf("Selecciona una opcion: ");
 
@@ -48,6 +64,14 @@ int main(void) {
         switch (opcion) {
             case 1:
                 agregar_superviviente(&refugio);
+                break;
+
+            case 2:
+                listar_supervivientes(&refugio);
+                break;
+
+            case 3:
+                mostrar_recursos(&refugio);
                 break;
 
             case 0:
@@ -70,12 +94,24 @@ void inicializar_refugio(Refugio *r) {
     r->lista = NULL;
     r->n = 0;
     r->capacidad = 0;
+
+    inicializar_recursos(r);
+}
+
+void inicializar_recursos(Refugio *r) {
+    r->recursos.agua = 100;
+    r->recursos.comida = 100;
+    r->recursos.medicamentos = 20;
+    r->recursos.municiones = 50;
 }
 
 void leer_texto(char texto[], int tamanio) {
     int c;
 
-    fgets(texto, tamanio, stdin);
+    if (fgets(texto, tamanio, stdin) == NULL) {
+        texto[0] = '\0';
+        return;
+    }
 
     if (strchr(texto, '\n') != NULL) {
         texto[strcspn(texto, "\n")] = '\0';
@@ -85,7 +121,7 @@ void leer_texto(char texto[], int tamanio) {
     }
 }
 
-int leer_entero() {
+int leer_entero(void) {
     char texto[30];
     int numero;
 
@@ -144,12 +180,15 @@ int agregar_superviviente(Refugio *r) {
             nueva_capacidad = r->capacidad * 2;
         }
 
-        /* Reservar memoria */
         if (r->lista == NULL) {
-            temporal = malloc(nueva_capacidad * sizeof(Superviviente));
+            temporal = malloc(
+                nueva_capacidad * sizeof(Superviviente)
+            );
         } else {
-            temporal = realloc(r->lista,
-                               nueva_capacidad * sizeof(Superviviente));
+            temporal = realloc(
+                r->lista,
+                nueva_capacidad * sizeof(Superviviente)
+            );
         }
 
         if (temporal == NULL) {
@@ -160,6 +199,7 @@ int agregar_superviviente(Refugio *r) {
         r->lista = temporal;
         r->capacidad = nueva_capacidad;
     }
+
     r->lista[r->n] = nuevo;
     r->n++;
 
@@ -168,4 +208,34 @@ int agregar_superviviente(Refugio *r) {
     return 1;
 }
 
+void listar_supervivientes(const Refugio *r) {
+
+    printf("\n===== SUPERVIVIENTES DEL REFUGIO =====\n");
+
+    if (r->n == 0) {
+        printf("No hay supervivientes registrados.\n");
+        return;
+    }
+
+    for (int i = 0; i < r->n; i++) {
+
+        printf("\nSuperviviente #%d\n", i + 1);
+        printf("Nombre: %s\n", r->lista[i].nombre);
+        printf("Edad: %d\n", r->lista[i].edad);
+        printf("Habilidad: %s\n", r->lista[i].habilidad);
+        printf("Salud: %d\n", r->lista[i].salud);
+    }
+
+    printf("\nTotal de supervivientes: %d\n", r->n);
+}
+
+void mostrar_recursos(const Refugio *r) {
+
+    printf("\n===== RECURSOS DEL REFUGIO =====\n");
+
+    printf("Agua: %d\n", r->recursos.agua);
+    printf("Comida: %d\n", r->recursos.comida);
+    printf("Medicamentos: %d\n", r->recursos.medicamentos);
+    printf("Municiones: %d\n", r->recursos.municiones);
+}
 
