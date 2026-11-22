@@ -1,4 +1,3 @@
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -6,11 +5,6 @@
 /*
  * Proyecto: Refugio de supervivientes zombi
  * Practica 3 - Introduccion a la Ingenieria de Software
- * HU-00: Preparar entorno y tablero
- * HU-01: Definir superviviente y refugio
- * HU-02: Registrar supervivientes
- * HU-03: Listar supervivientes
- * HU-04: Administrar recursos del refugio
  */
 
 typedef struct {
@@ -38,13 +32,19 @@ void inicializar_refugio(Refugio *r);
 void inicializar_recursos(Refugio *r);
 void leer_texto(char texto[], int tamanio);
 int leer_entero(void);
+
 int agregar_superviviente(Refugio *r);
 void listar_supervivientes(const Refugio *r);
 void mostrar_recursos(const Refugio *r);
 
+int modificar_recurso(Refugio *r, int tipo, int cantidad);
+
 int main(void) {
+
     Refugio refugio;
     int opcion;
+    int tipo;
+    int cantidad;
 
     inicializar_refugio(&refugio);
 
@@ -52,16 +52,20 @@ int main(void) {
     printf("Refugio de supervivientes zombi\n");
 
     do {
-        printf("\n----- MENU DEL REFUGIO -----\n");
+
+        printf("\n===== MENU DEL REFUGIO =====\n");
         printf("1. Registrar superviviente\n");
         printf("2. Listar supervivientes\n");
         printf("3. Mostrar recursos\n");
+        printf("4. Registrar entrada de recursos\n");
+        printf("5. Registrar salida de recursos\n");
         printf("0. Salir\n");
         printf("Selecciona una opcion: ");
 
         opcion = leer_entero();
 
         switch (opcion) {
+
             case 1:
                 agregar_superviviente(&refugio);
                 break;
@@ -72,6 +76,53 @@ int main(void) {
 
             case 3:
                 mostrar_recursos(&refugio);
+                break;
+
+            case 4:
+
+                printf("\n===== ENTRADA DE RECURSOS =====\n");
+                printf("1. Agua\n");
+                printf("2. Comida\n");
+                printf("3. Medicamentos\n");
+                printf("4. Municiones\n");
+                printf("Selecciona el recurso: ");
+
+                tipo = leer_entero();
+
+                printf("Cantidad que ingresa: ");
+                cantidad = leer_entero();
+
+                if (modificar_recurso(&refugio, tipo, cantidad)) {
+                    printf("\nEntrada registrada correctamente.\n");
+                } else {
+                    printf("\nNo se pudo registrar la entrada.\n");
+                }
+
+                break;
+
+            case 5:
+
+                printf("\n===== SALIDA DE RECURSOS =====\n");
+                printf("1. Agua\n");
+                printf("2. Comida\n");
+                printf("3. Medicamentos\n");
+                printf("4. Municiones\n");
+                printf("Selecciona el recurso: ");
+
+                tipo = leer_entero();
+
+                printf("Cantidad que sale: ");
+                cantidad = leer_entero();
+
+                /* Los tipos del 5 al 8 representan salidas */
+                tipo = tipo + 4;
+
+                if (modificar_recurso(&refugio, tipo, cantidad)) {
+                    printf("\nSalida registrada correctamente.\n");
+                } else {
+                    printf("\nNo se pudo registrar la salida.\n");
+                }
+
                 break;
 
             case 0:
@@ -91,21 +142,22 @@ int main(void) {
 }
 
 void inicializar_refugio(Refugio *r) {
+
     r->lista = NULL;
     r->n = 0;
     r->capacidad = 0;
 
     inicializar_recursos(r);
 }
-
 void inicializar_recursos(Refugio *r) {
+
     r->recursos.agua = 100;
     r->recursos.comida = 100;
     r->recursos.medicamentos = 20;
     r->recursos.municiones = 50;
 }
-
 void leer_texto(char texto[], int tamanio) {
+
     int c;
 
     if (fgets(texto, tamanio, stdin) == NULL) {
@@ -116,12 +168,13 @@ void leer_texto(char texto[], int tamanio) {
     if (strchr(texto, '\n') != NULL) {
         texto[strcspn(texto, "\n")] = '\0';
     } else {
+
         while ((c = getchar()) != '\n' && c != EOF) {
         }
     }
 }
-
 int leer_entero(void) {
+
     char texto[30];
     int numero;
 
@@ -130,6 +183,7 @@ int leer_entero(void) {
     }
 
     while (sscanf(texto, "%d", &numero) != 1) {
+
         printf("Ingresa un numero valido: ");
 
         if (fgets(texto, 30, stdin) == NULL) {
@@ -139,8 +193,8 @@ int leer_entero(void) {
 
     return numero;
 }
-
 int agregar_superviviente(Refugio *r) {
+
     Superviviente nuevo;
     Superviviente *temporal;
     int nueva_capacidad;
@@ -181,10 +235,13 @@ int agregar_superviviente(Refugio *r) {
         }
 
         if (r->lista == NULL) {
+
             temporal = malloc(
                 nueva_capacidad * sizeof(Superviviente)
             );
+
         } else {
+
             temporal = realloc(
                 r->lista,
                 nueva_capacidad * sizeof(Superviviente)
@@ -207,10 +264,9 @@ int agregar_superviviente(Refugio *r) {
 
     return 1;
 }
-
 void listar_supervivientes(const Refugio *r) {
 
-    printf("\n----- SUPERVIVIENTES DEL REFUGIO -----\n");
+    printf("\n===== SUPERVIVIENTES DEL REFUGIO =====\n");
 
     if (r->n == 0) {
         printf("No hay supervivientes registrados.\n");
@@ -238,4 +294,50 @@ void mostrar_recursos(const Refugio *r) {
     printf("Medicamentos: %d\n", r->recursos.medicamentos);
     printf("Municiones: %d\n", r->recursos.municiones);
 }
+int modificar_recurso(Refugio *r, int tipo, int cantidad) {
 
+    int *recurso;
+    if (cantidad <= 0) {
+        return 0;
+    }
+    switch (tipo) {
+
+        case 1:
+        case 5:
+            recurso = &r->recursos.agua;
+            break;
+
+        case 2:
+        case 6:
+            recurso = &r->recursos.comida;
+            break;
+
+        case 3:
+        case 7:
+            recurso = &r->recursos.medicamentos;
+            break;
+
+        case 4:
+        case 8:
+            recurso = &r->recursos.municiones;
+            break;
+
+        default:
+            return 0;
+    }
+    if (tipo >= 1 && tipo <= 4) {
+
+        *recurso = *recurso + cantidad;
+
+    }
+    else if (tipo >= 5 && tipo <= 8) {
+
+        if (cantidad > *recurso) {
+            return 0;
+        }
+
+        *recurso = *recurso - cantidad;
+    }
+
+    return 1;
+}
