@@ -52,7 +52,7 @@ int main(void) {
     printf("Refugio de supervivientes zombi\n");
 
     do {
-        printf("\n===== MENU DEL REFUGIO =====\n");
+        printf("\n----- MENU DEL REFUGIO -----\n");
         printf("1. Registrar superviviente\n");
         printf("2. Listar supervivientes\n");
         printf("3. Mostrar recursos\n");
@@ -210,7 +210,7 @@ int agregar_superviviente(Refugio *r) {
 
 void listar_supervivientes(const Refugio *r) {
 
-    printf("\n===== SUPERVIVIENTES DEL REFUGIO =====\n");
+    printf("\n----- SUPERVIVIENTES DEL REFUGIO -----\n");
 
     if (r->n == 0) {
         printf("No hay supervivientes registrados.\n");
